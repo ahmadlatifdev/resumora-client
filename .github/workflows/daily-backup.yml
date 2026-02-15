@@ -1,16 +1,18 @@
 name: Daily Code Backup
 on:
   schedule:
-    - cron: '0 0 * * *'   # runs every day at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
 jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create archive
-        run: zip -r backup-$(date +%Y%m%d).zip .
-      - name: Upload archive as artifact
-        uses: actions/upload-artifact@v3
+        run: zip -r backup-$(date +%Y%m%d).zip . -x "*.git*" ".github/*" "node_modules/*"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: code-backup-${{ github.run_id }}
           path: backup-*.zip
